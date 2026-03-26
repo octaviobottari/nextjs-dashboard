@@ -1,3 +1,5 @@
+// middleware.ts  (en la raíz del proyecto)
+
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 

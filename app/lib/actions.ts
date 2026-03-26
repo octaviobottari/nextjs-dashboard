@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { neon } from '@neondatabase/serverless';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { signIn } from '@/auth';
 
 const sql = neon(process.env.POSTGRES_URL!);
 
@@ -66,14 +67,17 @@ export async function createInvoice(prevState: State, formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
-// Add this to /app/lib/actions.ts
-export async function authenticate(prevState: string | undefined, formData: FormData) {
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
   try {
-    // For now, just simulate a successful login
-    // In a real app, you'd call signIn from next-auth
-    console.log('Login attempt with:', formData.get('email'));
-    return 'success';
+    await signIn('credentials', formData);
   } catch (error) {
-    return 'Invalid credentials.';
+    if ((error as Error).message.includes('CredentialsSignin')) {
+      return 'Invalid credentials.';
+    }
+    throw error;
   }
 }
+
